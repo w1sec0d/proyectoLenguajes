@@ -5,10 +5,6 @@ from dreamchaser_interpreter import DreamchaserInterpreter
 
 
 def run_program(program_text):
-    print("\n======= Running Program =======")
-    print(program_text[:50] + "..." if len(program_text) > 50 else program_text)
-    print("==============================\n")
-
     # Create lexer and parser
     input_stream = InputStream(program_text)
     lexer = DreamchaserLexer(input_stream)
@@ -23,16 +19,16 @@ def run_program(program_text):
     walker = ParseTreeWalker()
     walker.walk(interpreter, tree)
 
-    print("\n======= Program Result =======")
+    print("\n======= Resultado ejecucion =======")
     print("Variables:", end="\n")
     for var, value in interpreter.variables.items():
         print(f"  {var} = {value}")
 
-    print("\nConstants:", end="\n")
+    print("\nConstantes:", end="\n")
     for const, value in interpreter.constants.items():
         print(f"  {const} = {value}")
 
-    print("\nFunctions:", end="\n")
+    print("\nFunciones:", end="\n")
     for func_name in interpreter.functions:
         print(f"  {func_name}({', '.join(interpreter.functions[func_name]['params'])})")
 
@@ -100,7 +96,6 @@ funcion suma(a, b)
     programaPrueba3 = """
 const PI 3.141592654
 const MATERIA 'LENGUAJES DE PROGRAMACIÓN'
-const MATERIA 'REPETIDA'
 a = 10
 b = 20
 suma = a + b
@@ -110,6 +105,12 @@ suma = a + b
 const NOTA 4
 a = 10
 b = NOTA + 1
+"""
+
+    programaPrint = """
+a = 42
+b = 2
+c = a + b
 """
 
     # Run each program

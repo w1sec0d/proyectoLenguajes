@@ -15,6 +15,7 @@ class DreamchaserInterpreter(DreamchaserListener):
 
         # Pre-defined libraries
         self.libraries = {"raizCuadrada": math.sqrt, "potencia": pow}
+        # The print function will be added in main.py
 
     # Helper method to evaluate expressions
     def evaluate(self, ctx):
@@ -135,11 +136,15 @@ class DreamchaserInterpreter(DreamchaserListener):
                     return None
                 args.append(arg_value)
 
-        # Check if it's a built-in library function
+        # Check if it's a built-in library function (including print)
         if function_name in self.imported_libraries:
             if function_name in self.libraries:
                 try:
-                    return self.libraries[function_name](*args)
+                    result = self.libraries[function_name](*args)
+                    # For print function, return None since print doesn't return a value in Python
+                    if function_name == "imprimir":
+                        return None
+                    return result
                 except Exception as e:
                     print(
                         f"Error executing library function '{function_name}': {str(e)}"
