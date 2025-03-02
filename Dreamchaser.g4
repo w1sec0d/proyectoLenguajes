@@ -1,46 +1,77 @@
 grammar Dreamchaser;
 
-prog: statement* EOF;
+// Parser Rules
+program: (NEWLINE | statement)* EOF;
 
 statement:
-	importStmt
-	| constStmt
-	| varDecl
-	| assignment
-	| arithmeticExpr
-	| relationalExpr
-	| controlStructure
-	| functionDecl
-	| functionCall
-	| printStmt
-	| COMMENT
-	| NEWLINE;
+	importStatement
+	| constStatement
+	| assignmentStatement
+	| conditionalStatement
+	| whileStatement
+	| functionDefinition
+	| returnStatement
+	| functionCall NEWLINE
+	| COMMENT NEWLINE?;
 
-importStmt: 'importar' STRING;
-constStmt: 'const' ID '=' expr;
-varDecl: ID '=' expr;
-assignment: ID '=' expr;
-arithmeticExpr: expr (('*' | '/') expr | ('+' | '-') expr);
-relationalExpr:
-	expr (('==' | '!=' | '>' | '<' | '>=' | '<=') expr);
-controlStructure:
-	'si' expr 'retornar' expr ('sino' 'retornar' expr)?
-	| 'mientras' expr statement*;
-functionDecl: 'funcion' ID '(' paramList? ')' statement*;
-functionCall: ID '(' argList? ')';
-printStmt: 'imprimir' '(' expr ')';
+importStatement: 'importar' STRING NEWLINE;
+constStatement: 'const' ID (EQUALS)? literal NEWLINE;
+assignmentStatement: ID EQUALS expression NEWLINE;
 
+conditionalStatement:
+	'si' expression (COMMENT)? NEWLINE block (
+		'sino' (expression)? (COMMENT)? NEWLINE block
+	)?;
+
+whileStatement: 'mientras' expression NEWLINE block;
+
+functionDefinition:
+	'funcion' ID '(' paramList? ')' NEWLINE block;
 paramList: ID (',' ID)*;
-argList: expr (',' expr)*;
+returnStatement: 'retornar' expression NEWLINE;
 
-expr: INT | FLOAT | BOOL | STRING | ID | '(' expr ')';
+functionCall: ID '(' argList? ')';
+argList: expression (',' expression)*;
+
+block: statement+;
+
+expression:
+	literal																	# LiteralExpr
+	| ID																	# IdentifierExpr
+	| functionCall															# FunctionCallExpr
+	| '(' expression ')'													# ParenExpr
+	| expression op = ('*' | '/' | '//' | '%') expression					# MulDivExpr
+	| expression op = ('+' | '-') expression								# AddSubExpr
+	| expression op = ('==' | '!=' | '>' | '<' | '>=' | '<=') expression	# RelationalExpr;
+
+literal:
+	NUMBER		# NumberLiteral
+	| STRING	# StringLiteral
+	| BOOLEAN	# BooleanLiteral;
+
+// Lexer Rules
+BOOLEAN: 'verdadero' | 'falso';
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
+NUMBER: INT ('.' [0-9]*)? (('e' | 'E') ('+' | '-')? [0-9]+)?;
+fragment INT: [0-9]+;
+STRING: '\'' (~[\r\n'])* '\'';
+
+EQUALS: '=';
+PLUS: '+';
+MINUS: '-';
+MULTIPLY: '*';
+DIVIDE: '/';
+INT_DIVIDE: '//';
+MODULO: '%';
+EQ: '==';
+NEQ: '!=';
+GT: '>';
+LT: '<';
+GTE: '>=';
+LTE: '<=';
+LPAREN: '(';
+RPAREN: ')';
 
 COMMENT: '#' ~[\r\n]*;
-NEWLINE: [\r\n]+;
+NEWLINE: '\r'? '\n';
 WS: [ \t]+ -> skip;
-
-ID: [a-zA-Z_][a-zA-Z_0-9]*;
-INT: [0-9]+;
-FLOAT: [0-9]+ '.' [0-9]+;
-BOOL: 'verdadero' | 'falso';
-STRING: '\'' .*? '\'';

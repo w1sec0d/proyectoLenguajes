@@ -39,23 +39,18 @@ class AnalizadorSemantico(DreamchaserListener):
             izquierda = ctx.expr(0).getText()
             derecha = ctx.expr(1).getText()
             operador = ctx.getChild(1).getText()
-            if izquierda in self.variables and derecha in self.variables:
-                izquierda_valor = float(self.variables[izquierda])
-                derecha_valor = float(self.variables[derecha])
-                if operador == "+":
-                    resultado = izquierda_valor + derecha_valor
-                elif operador == "-":
-                    resultado = izquierda_valor - derecha_valor
-                elif operador == "*":
-                    resultado = izquierda_valor * derecha_valor
-                elif operador == "/":
-                    resultado = izquierda_valor / derecha_valor
-                self.variables[ctx.getText()] = resultado
-                print(f"Resultado de {izquierda} {operador} {derecha} = {resultado}")
-            else:
-                print(
-                    f"Error: Una o ambas variables '{izquierda}' o '{derecha}' no están declaradas"
-                )
+            izquierda_valor = float(self.variables.get(izquierda, izquierda))
+            derecha_valor = float(self.variables.get(derecha, derecha))
+            if operador == "+":
+                resultado = izquierda_valor + derecha_valor
+            elif operador == "-":
+                resultado = izquierda_valor - derecha_valor
+            elif operador == "*":
+                resultado = izquierda_valor * derecha_valor
+            elif operador == "/":
+                resultado = izquierda_valor / derecha_valor
+            self.variables[ctx.getText()] = resultado
+            print(f"Resultado de {izquierda} {operador} {derecha} = {resultado}")
 
     def exitPrintStmt(self, ctx):
         # Maneja la impresión de resultados
