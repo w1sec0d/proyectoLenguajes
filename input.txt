@@ -1,4 +1,2 @@
-const PI = 3.141592654
 a = 10
-b = 20.5
-si a > b retornar a sino retornar b
+b = 3
