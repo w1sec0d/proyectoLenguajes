@@ -105,6 +105,7 @@ suma = a + b
 const NOTA 4
 a = 10
 b = NOTA + 1
+imprimir(a)
 """
 
     programaPrint = """
