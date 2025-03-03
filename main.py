@@ -128,7 +128,14 @@ si a
     imprimir('verdadero')
 c = potencia(2,2)
 """
-    ejecutar_programa(programa2)
+
+    programa_crear_nodo = """
+crear_nodo nodo1('variable', '10')
+crear_nodo nodo2('variable', '20')
+crear_nodo nodo3('funcion', 'suma')
+"""
+
+    ejecutar_programa(programa_crear_nodo)
 
 
 if __name__ == "__main__":

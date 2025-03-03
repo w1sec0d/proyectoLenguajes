@@ -4,6 +4,45 @@ from antlr_output.DreamchaserListener import DreamchaserListener
 import math
 
 
+class Nodo:
+    def __init__(self, id, tipo, valor=None):
+        self.id = id
+        self.tipo = tipo
+        self.valor = valor
+        self.lugares = []
+        self.enlaces = []
+
+    def agregar_lugar(self, nodo):
+        self.lugares.append(nodo)
+
+    def agregar_enlace(self, nodo):
+        self.enlaces.append(nodo)
+
+    def __repr__(self):
+        return f"Nodo(id={self.id}, tipo={self.tipo}, valor={self.valor})"
+
+
+class Bigrafo:
+    def __init__(self):
+        self.nodos = {}
+
+    def agregar_nodo(self, id, tipo, valor=None):
+        if id not in self.nodos:
+            self.nodos[id] = Nodo(id, tipo, valor)
+        return self.nodos[id]
+
+    def agregar_lugar(self, id_padre, id_hijo):
+        if id_padre in self.nodos and id_hijo in self.nodos:
+            self.nodos[id_padre].agregar_lugar(self.nodos[id_hijo])
+
+    def agregar_enlace(self, id_origen, id_destino):
+        if id_origen in self.nodos and id_destino in self.nodos:
+            self.nodos[id_origen].agregar_enlace(self.nodos[id_destino])
+
+    def __repr__(self):
+        return f"Bigrafo(nodos={self.nodos})"
+
+
 class DreamchaserInterpreter(DreamchaserListener):
     def __init__(self):
         self.variables = {}
@@ -12,6 +51,7 @@ class DreamchaserInterpreter(DreamchaserListener):
         self.librerias_importadas = set()
         self.valor_actual = None
         self.resultados_bloque = {}
+        self.bigrafo = Bigrafo()
 
         # Librerías predefinidas
         self.librerias = {
@@ -300,6 +340,13 @@ class DreamchaserInterpreter(DreamchaserListener):
 
     def enterFunctionCall(self, ctx):
         self.valor_actual = self.evaluar_llamada_funcion(ctx)
+
+    def enterCrearNodoStatement(self, ctx):
+        id_nodo = ctx.ID().getText()
+        tipo = ctx.STRING(0).getText()[1:-1]  # Eliminar comillas
+        valor = ctx.STRING(1).getText()[1:-1]  # Eliminar comillas
+        self.bigrafo.agregar_nodo(id_nodo, tipo, valor)
+        print(f"Nodo creado: {id_nodo} (tipo: {tipo}, valor: {valor})")
 
     # Método auxiliar para ejecutar un bloque de declaraciones
     def ejecutar_bloque(self, ctx_bloque):

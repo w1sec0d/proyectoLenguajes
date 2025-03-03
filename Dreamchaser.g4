@@ -12,8 +12,10 @@ statement:
 	| functionDefinition
 	| returnStatement
 	| functionCall NEWLINE
+	| crearNodoStatement NEWLINE
 	| COMMENT NEWLINE?;
 
+crearNodoStatement: 'crear_nodo' ID '(' STRING ',' STRING ')';
 importStatement: 'importar' STRING NEWLINE;
 constStatement: 'const' ID (EQUALS)? literal NEWLINE;
 assignmentStatement: ID EQUALS expression NEWLINE;
