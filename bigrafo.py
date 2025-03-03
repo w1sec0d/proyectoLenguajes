@@ -12,14 +12,6 @@ class Nodo:
     def agregar_enlace(self, nodo):
         self.enlaces.append(nodo)
 
-    def eliminar_lugar(self, nodo):
-        if nodo in self.lugares:
-            self.lugares.remove(nodo)
-
-    def eliminar_enlace(self, nodo):
-        if nodo in self.enlaces:
-            self.enlaces.remove(nodo)
-
     def __repr__(self):
         return f"Nodo(id={self.id}, tipo={self.tipo}, valor={self.valor}, lugares={self.lugares}, enlaces={self.enlaces})"
 
@@ -75,6 +67,16 @@ class Bigrafo:
         for id, nodo in self.nodos.items():
             nuevo_bigrafo.nodos[id] = nodo
         return nuevo_bigrafo
+
+    def contar_lugares(self, id_nodo):
+        if id_nodo in self.nodos:
+            return len(self.nodos[id_nodo].lugares)
+        return 0
+
+    def contar_enlaces(self, id_nodo):
+        if id_nodo in self.nodos:
+            return len(self.nodos[id_nodo].enlaces)
+        return 0
 
     def __repr__(self):
         return f"Bigrafo(nodos={self.nodos})"

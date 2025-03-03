@@ -19,14 +19,10 @@ statement:
 	| interseccionBigrafosStatement NEWLINE
 	| diferenciaBigrafosStatement NEWLINE
 	| clonarBigrafoStatement NEWLINE
-	| eliminarLugarStatement NEWLINE
-	| eliminarEnlaceStatement NEWLINE
 	| contarLugaresStatement NEWLINE
 	| contarEnlacesStatement NEWLINE
 	| COMMENT NEWLINE?;
 
-eliminarLugarStatement: 'eliminar_lugar' ID ',' ID;
-eliminarEnlaceStatement: 'eliminar_enlace' ID ',' ID;
 contarLugaresStatement: 'contar_lugares' ID;
 contarEnlacesStatement: 'contar_enlaces' ID;
 interseccionBigrafosStatement:

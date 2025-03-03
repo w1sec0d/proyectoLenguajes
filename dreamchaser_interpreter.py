@@ -413,37 +413,17 @@ class DreamchaserInterpreter(DreamchaserListener):
         else:
             print(f"Error: Uno o ambos bigrafos '{id1}' y '{id2}' no existen")
 
-    def enterEliminarLugarStatement(self, ctx):
-        id_padre = ctx.ID(0).getText()
-        id_hijo = ctx.ID(1).getText()
-        self.eliminar_lugar(id_padre, id_hijo)
-
-    def eliminar_lugar(self, id_padre, id_hijo):
-        if id_padre in self.bigrafos and id_hijo in self.bigrafos:
-            self.bigrafos[id_padre].eliminar_lugar(id_padre, id_hijo)
-            print(f"Lugar '{id_hijo}' eliminado de '{id_padre}'")
-        else:
-            print(f"Error: Uno o ambos nodos '{id_padre}' y '{id_hijo}' no existen")
-
-    def enterEliminarEnlaceStatement(self, ctx):
-        id_origen = ctx.ID(0).getText()
-        id_destino = ctx.ID(1).getText()
-        self.eliminar_enlace(id_origen, id_destino)
-
-    def eliminar_enlace(self, id_origen, id_destino):
-        if id_origen in self.bigrafos and id_destino in self.bigrafos:
-            self.bigrafos[id_origen].eliminar_enlace(id_origen, id_destino)
-            print(f"Enlace '{id_destino}' eliminado de '{id_origen}'")
-        else:
-            print(f"Error: Uno o ambos nodos '{id_origen}' y '{id_destino}' no existen")
-
     def enterContarLugaresStatement(self, ctx):
         id_nodo = ctx.ID().getText()
         self.contar_lugares(id_nodo)
 
     def contar_lugares(self, id_nodo):
-        if id_nodo in self.bigrafos:
-            count = self.bigrafos[id_nodo].contar_lugares(id_nodo)
+        if self.bigrafo_actual is None:
+            print("Error: No hay un bigrafo seleccionado")
+            return
+
+        if id_nodo in self.bigrafos[self.bigrafo_actual].nodos:
+            count = self.bigrafos[self.bigrafo_actual].contar_lugares(id_nodo)
             print(f"Nodo '{id_nodo}' tiene {count} lugares")
         else:
             print(f"Error: Nodo '{id_nodo}' no existe")
@@ -453,8 +433,12 @@ class DreamchaserInterpreter(DreamchaserListener):
         self.contar_enlaces(id_nodo)
 
     def contar_enlaces(self, id_nodo):
-        if id_nodo in self.bigrafos:
-            count = self.bigrafos[id_nodo].contar_enlaces(id_nodo)
+        if self.bigrafo_actual is None:
+            print("Error: No hay un bigrafo seleccionado")
+            return
+
+        if id_nodo in self.bigrafos[self.bigrafo_actual].nodos:
+            count = self.bigrafos[self.bigrafo_actual].contar_enlaces(id_nodo)
             print(f"Nodo '{id_nodo}' tiene {count} enlaces")
         else:
             print(f"Error: Nodo '{id_nodo}' no existe")
