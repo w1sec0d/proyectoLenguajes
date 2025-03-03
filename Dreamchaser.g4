@@ -16,8 +16,16 @@ statement:
 	| crearBigrafoStatement NEWLINE
 	| seleccionarBigrafoStatement NEWLINE
 	| unirBigrafosStatement NEWLINE
+	| interseccionBigrafosStatement NEWLINE
+	| diferenciaBigrafosStatement NEWLINE
+	| clonarBigrafoStatement NEWLINE
 	| COMMENT NEWLINE?;
 
+interseccionBigrafosStatement:
+	'interseccion_bigrafos' ID ',' ID 'en' ID;
+diferenciaBigrafosStatement:
+	'diferencia_bigrafos' ID ',' ID 'en' ID;
+clonarBigrafoStatement: 'clonar_bigrafo' ID 'en' ID;
 crearBigrafoStatement: 'crear_bigrafo' ID;
 seleccionarBigrafoStatement: 'seleccionar_bigrafo' ID;
 crearNodoStatement: 'crear_nodo' ID '(' STRING ',' STRING ')';

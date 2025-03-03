@@ -10,3 +10,12 @@ crear_nodo nodo3('funcion', 'suma')
 
 # Unir los dos bigrafos en un nuevo bigrafo
 unir_bigrafos bigrafo1, bigrafo2 en bigrafo_union
+
+# Intersección de los dos bigrafos en un nuevo bigrafo
+interseccion_bigrafos bigrafo1, bigrafo2 en bigrafo_interseccion
+
+# Diferencia de los dos bigrafos en un nuevo bigrafo
+diferencia_bigrafos bigrafo1, bigrafo2 en bigrafo_diferencia
+
+# Clonar un bigrafo
+clonar_bigrafo bigrafo1 en bigrafo_clon

@@ -2,60 +2,7 @@ from antlr4 import *
 from antlr_output.DreamchaserParser import DreamchaserParser
 from antlr_output.DreamchaserListener import DreamchaserListener
 import math
-
-
-class Nodo:
-    def __init__(self, id, tipo, valor=None):
-        self.id = id
-        self.tipo = tipo
-        self.valor = valor
-        self.lugares = []
-        self.enlaces = []
-
-    def agregar_lugar(self, nodo):
-        self.lugares.append(nodo)
-
-    def agregar_enlace(self, nodo):
-        self.enlaces.append(nodo)
-
-    def __repr__(self):
-        return f"Nodo(id={self.id}, tipo={self.tipo}, valor={self.valor})"
-
-
-class Bigrafo:
-    def __init__(self):
-        self.nodos = {}
-
-    def agregar_nodo(self, id, tipo, valor=None):
-        if id not in self.nodos:
-            self.nodos[id] = Nodo(id, tipo, valor)
-        return self.nodos[id]
-
-    def agregar_lugar(self, id_padre, id_hijo):
-        if id_padre in self.nodos and id_hijo in self.nodos:
-            self.nodos[id_padre].agregar_lugar(self.nodos[id_hijo])
-
-    def agregar_enlace(self, id_origen, id_destino):
-        if id_origen in self.nodos and id_destino in self.nodos:
-            self.nodos[id_origen].agregar_enlace(self.nodos[id_destino])
-
-    def union(self, otro_bigrafo):
-        nuevo_bigrafo = Bigrafo()
-        # Copiar nodos y conexiones del primer bigrafo
-        for id, nodo in self.nodos.items():
-            nuevo_bigrafo.nodos[id] = nodo
-        # Copiar nodos y conexiones del segundo bigrafo
-        for id, nodo in otro_bigrafo.nodos.items():
-            if id not in nuevo_bigrafo.nodos:
-                nuevo_bigrafo.nodos[id] = nodo
-            else:
-                # Si el nodo ya existe, combinar lugares y enlaces
-                nuevo_bigrafo.nodos[id].lugares.extend(nodo.lugares)
-                nuevo_bigrafo.nodos[id].enlaces.extend(nodo.enlaces)
-        return nuevo_bigrafo
-
-    def __repr__(self):
-        return f"Bigrafo(nodos={self.nodos})"
+from bigrafo import Bigrafo, Nodo
 
 
 class DreamchaserInterpreter(DreamchaserListener):
@@ -407,6 +354,54 @@ class DreamchaserInterpreter(DreamchaserListener):
         id2 = ctx.ID(1).getText()
         id_nuevo = ctx.ID(2).getText()
         self.unir_bigrafos(id1, id2, id_nuevo)
+
+    def enterInterseccionBigrafosStatement(self, ctx):
+        id1 = ctx.ID(0).getText()
+        id2 = ctx.ID(1).getText()
+        id_nuevo = ctx.ID(2).getText()
+        self.interseccion_bigrafos(id1, id2, id_nuevo)
+
+    def interseccion_bigrafos(self, id1, id2, id_nuevo):
+        if id1 in self.bigrafos and id2 in self.bigrafos:
+            bigrafo1 = self.bigrafos[id1]
+            bigrafo2 = self.bigrafos[id2]
+            nuevo_bigrafo = bigrafo1.interseccion(bigrafo2)
+            self.bigrafos[id_nuevo] = nuevo_bigrafo
+            print(
+                f"Bigrafo '{id_nuevo}' creado por la intersección de '{id1}' y '{id2}'"
+            )
+        else:
+            print(f"Error: Uno o ambos bigrafos '{id1}' y '{id2}' no existen")
+
+    def enterDiferenciaBigrafosStatement(self, ctx):
+        id1 = ctx.ID(0).getText()
+        id2 = ctx.ID(1).getText()
+        id_nuevo = ctx.ID(2).getText()
+        self.diferencia_bigrafos(id1, id2, id_nuevo)
+
+    def diferencia_bigrafos(self, id1, id2, id_nuevo):
+        if id1 in self.bigrafos and id2 in self.bigrafos:
+            bigrafo1 = self.bigrafos[id1]
+            bigrafo2 = self.bigrafos[id2]
+            nuevo_bigrafo = bigrafo1.diferencia(bigrafo2)
+            self.bigrafos[id_nuevo] = nuevo_bigrafo
+            print(f"Bigrafo '{id_nuevo}' creado por la diferencia de '{id1}' y '{id2}'")
+        else:
+            print(f"Error: Uno o ambos bigrafos '{id1}' y '{id2}' no existen")
+
+    def enterClonarBigrafoStatement(self, ctx):
+        id_original = ctx.ID(0).getText()
+        id_clon = ctx.ID(1).getText()
+        self.clonar_bigrafo(id_original, id_clon)
+
+    def clonar_bigrafo(self, id_original, id_clon):
+        if id_original in self.bigrafos:
+            bigrafo_original = self.bigrafos[id_original]
+            bigrafo_clon = bigrafo_original.clonar()
+            self.bigrafos[id_clon] = bigrafo_clon
+            print(f"Bigrafo '{id_clon}' creado como clon de '{id_original}'")
+        else:
+            print(f"Error: Bigrafo '{id_original}' no existe")
 
     def unir_bigrafos(self, id1, id2, id_nuevo):
         if id1 in self.bigrafos and id2 in self.bigrafos:
