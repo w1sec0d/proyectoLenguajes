@@ -39,6 +39,21 @@ class Bigrafo:
         if id_origen in self.nodos and id_destino in self.nodos:
             self.nodos[id_origen].agregar_enlace(self.nodos[id_destino])
 
+    def union(self, otro_bigrafo):
+        nuevo_bigrafo = Bigrafo()
+        # Copiar nodos y conexiones del primer bigrafo
+        for id, nodo in self.nodos.items():
+            nuevo_bigrafo.nodos[id] = nodo
+        # Copiar nodos y conexiones del segundo bigrafo
+        for id, nodo in otro_bigrafo.nodos.items():
+            if id not in nuevo_bigrafo.nodos:
+                nuevo_bigrafo.nodos[id] = nodo
+            else:
+                # Si el nodo ya existe, combinar lugares y enlaces
+                nuevo_bigrafo.nodos[id].lugares.extend(nodo.lugares)
+                nuevo_bigrafo.nodos[id].enlaces.extend(nodo.enlaces)
+        return nuevo_bigrafo
+
     def __repr__(self):
         return f"Bigrafo(nodos={self.nodos})"
 
@@ -386,6 +401,22 @@ class DreamchaserInterpreter(DreamchaserListener):
         print(
             f"Nodo creado en {self.bigrafo_actual}: {id_nodo} (tipo: {tipo}, valor: {valor})"
         )
+
+    def enterUnirBigrafosStatement(self, ctx):
+        id1 = ctx.ID(0).getText()
+        id2 = ctx.ID(1).getText()
+        id_nuevo = ctx.ID(2).getText()
+        self.unir_bigrafos(id1, id2, id_nuevo)
+
+    def unir_bigrafos(self, id1, id2, id_nuevo):
+        if id1 in self.bigrafos and id2 in self.bigrafos:
+            bigrafo1 = self.bigrafos[id1]
+            bigrafo2 = self.bigrafos[id2]
+            nuevo_bigrafo = bigrafo1.union(bigrafo2)
+            self.bigrafos[id_nuevo] = nuevo_bigrafo
+            print(f"Bigrafo '{id_nuevo}' creado por la unión de '{id1}' y '{id2}'")
+        else:
+            print(f"Error: Uno o ambos bigrafos '{id1}' y '{id2}' no existen")
 
     # Método auxiliar para ejecutar un bloque de declaraciones
     def ejecutar_bloque(self, ctx_bloque):

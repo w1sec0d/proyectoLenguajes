@@ -1,7 +1,12 @@
+# Crear el primer bigrafo y agregar nodos
 crear_bigrafo bigrafo1
 crear_nodo nodo1('variable', '10')
 crear_nodo nodo2('variable', '20')
 
+# Crear el segundo bigrafo y agregar un nodo
 crear_bigrafo bigrafo2
 seleccionar_bigrafo bigrafo2
 crear_nodo nodo3('funcion', 'suma')
+
+# Unir los dos bigrafos en un nuevo bigrafo
+unir_bigrafos bigrafo1, bigrafo2 en bigrafo_union

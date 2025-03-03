@@ -15,11 +15,13 @@ statement:
 	| crearNodoStatement NEWLINE
 	| crearBigrafoStatement NEWLINE
 	| seleccionarBigrafoStatement NEWLINE
+	| unirBigrafosStatement NEWLINE
 	| COMMENT NEWLINE?;
 
-crearNodoStatement: 'crear_nodo' ID '(' STRING ',' STRING ')';
 crearBigrafoStatement: 'crear_bigrafo' ID;
 seleccionarBigrafoStatement: 'seleccionar_bigrafo' ID;
+crearNodoStatement: 'crear_nodo' ID '(' STRING ',' STRING ')';
+unirBigrafosStatement: 'unir_bigrafos' ID ',' ID 'en' ID;
 importStatement: 'importar' STRING NEWLINE;
 constStatement: 'const' ID (EQUALS)? literal NEWLINE;
 assignmentStatement: ID EQUALS expression NEWLINE;
