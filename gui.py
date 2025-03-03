@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, scrolledtext, messagebox
+from PIL import Image, ImageTk
 from antlr4 import *
 from antlr_output.DreamchaserLexer import DreamchaserLexer
 from antlr_output.DreamchaserParser import DreamchaserParser
@@ -17,10 +18,19 @@ class DreamchaserGUI:
         self.create_widgets()
 
     def create_widgets(self):
-        # Título
+        # Título e imagen
+        title_frame = tk.Frame(self.root)
+        title_frame.grid(row=0, column=0, columnspan=3, pady=10)
+        # Cargar imagen
+        image = Image.open("./assets/dream.png")
+        image = image.resize((50, 50))
+        photo = ImageTk.PhotoImage(image)
+        tk.Label(title_frame, image=photo).pack(side=tk.LEFT)
+        self.root.image = photo  # Guardar referencia para evitar que la imagen sea recolectada por el garbage collector
+
         tk.Label(
-            self.root, text="Dreamchaser: Edición Bigrafos", font=("Helvetica", 16)
-        ).grid(row=0, column=0, columnspan=3, pady=10)
+            title_frame, text="Dreamchaser: Edición Bigrafos", font=("Helvetica", 16)
+        ).pack(side=tk.LEFT)
 
         # Columna 1: Área de escritura y botones
         tk.Label(self.root, text="Código en Dreamchaser:").grid(
