@@ -387,14 +387,6 @@ class DreamchaserInterpreter(DreamchaserListener):
             f"Nodo creado en {self.bigrafo_actual}: {id_nodo} (tipo: {tipo}, valor: {valor})"
         )
 
-        id_nodo = ctx.ID().getText()
-        tipo = ctx.STRING(0).getText()[1:-1]  # Eliminar comillas
-        valor = ctx.STRING(1).getText()[1:-1]  # Eliminar comillas
-        self.bigrafos[self.bigrafo_actual].agregar_nodo(id_nodo, tipo, valor)
-        print(
-            f"Nodo creado en {self.bigrafo_actual}: {id_nodo} (tipo: {tipo}, valor: {valor})"
-        )
-
     # Método auxiliar para ejecutar un bloque de declaraciones
     def ejecutar_bloque(self, ctx_bloque):
         if ctx_bloque is None:

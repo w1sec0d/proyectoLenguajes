@@ -80,7 +80,7 @@ class DreamchaserGUI:
         self.state_area.config(state="disabled")
 
     def ejecutar_programa(self, texto_programa):
-        # ...existing code from main.py...
+        # Crear lexer y parser
         flujo_entrada = InputStream(texto_programa)
         lexer = DreamchaserLexer(flujo_entrada)
         flujo_tokens = CommonTokenStream(lexer)
