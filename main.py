@@ -19,7 +19,7 @@ def run_program(program_text):
     walker = ParseTreeWalker()
     walker.walk(interpreter, tree)
 
-    print("\n======= Resultado ejecucion =======")
+    print("\n======= Estado final =======")
     print("Variables:", end="\n")
     for var, value in interpreter.variables.items():
         print(f"  {var} = {value}")

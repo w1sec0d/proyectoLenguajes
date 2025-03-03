@@ -14,8 +14,11 @@ class DreamchaserInterpreter(DreamchaserListener):
         self.block_results = {}
 
         # Pre-defined libraries
-        self.libraries = {"raizCuadrada": math.sqrt, "potencia": pow}
-        # The print function will be added in main.py
+        self.libraries = {
+            "raizCuadrada": math.sqrt,
+            "potencia": pow,
+            "imprimir": print,
+        }  # The print function will be added in main.p
 
     # Helper method to evaluate expressions
     def evaluate(self, ctx):
@@ -125,7 +128,6 @@ class DreamchaserInterpreter(DreamchaserListener):
     def evaluate_function_call(self, ctx):
         function_name = ctx.ID().getText()
         args = []
-
         if ctx.argList():
             for expr in ctx.argList().expression():
                 arg_value = self.evaluate(expr)
@@ -137,7 +139,7 @@ class DreamchaserInterpreter(DreamchaserListener):
                 args.append(arg_value)
 
         # Check if it's a built-in library function (including print)
-        if function_name in self.imported_libraries:
+        if function_name in self.imported_libraries or function_name in self.libraries:
             if function_name in self.libraries:
                 try:
                     result = self.libraries[function_name](*args)
@@ -186,6 +188,7 @@ class DreamchaserInterpreter(DreamchaserListener):
 
             return result
 
+        # Check if it's a built-in function
         print(f"Error: Function '{function_name}' is not defined")
         return None
 
