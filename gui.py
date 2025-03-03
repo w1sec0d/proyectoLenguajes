@@ -17,38 +17,50 @@ class DreamchaserGUI:
         self.create_widgets()
 
     def create_widgets(self):
+        # Título
+        tk.Label(
+            self.root, text="Dreamchaser: Edición Bigrafos", font=("Helvetica", 16)
+        ).grid(row=0, column=0, columnspan=3, pady=10)
+
         # Columna 1: Área de escritura y botones
+        tk.Label(self.root, text="Código en Dreamchaser:").grid(
+            row=1, column=0, sticky="ew"
+        )
         self.text_area = scrolledtext.ScrolledText(
             self.root, wrap=tk.WORD, width=60, height=20
         )
-        self.text_area.grid(row=0, column=0, rowspan=3, padx=10, pady=10, sticky="nsew")
+        self.text_area.grid(row=2, column=0, rowspan=6, padx=10, pady=10, sticky="nsew")
 
-        # Cambia la disposición de los botones para que estén en la misma fila
+        # Columna 2: Botones
         self.load_button = tk.Button(
             self.root, text="Cargar Programa (.txt)", command=self.load_program
         )
-        self.load_button.grid(row=3, column=0)
+        self.load_button.grid(row=1, column=1, pady=5, sticky="ew")
 
         self.run_button = tk.Button(
             self.root, text="Ejecutar Programa", command=self.run_program
         )
-        self.run_button.grid(row=4, column=0)
+        self.run_button.grid(row=1, column=2, pady=5, sticky="ew")
 
-        # Columna 2: Áreas de salida
+        # Columna 3: Áreas de salida
         tk.Label(self.root, text="Salida de ejecución:").grid(
-            row=0, column=1, sticky="ew"
+            row=2, column=1, columnspan=2, sticky="ew"
         )
         self.output_area = scrolledtext.ScrolledText(
             self.root, wrap=tk.WORD, width=60, height=10, state="disabled"
         )
-        self.output_area.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+        self.output_area.grid(
+            row=3, column=1, columnspan=2, padx=10, pady=10, sticky="nsew"
+        )
 
-        tk.Label(self.root, text="Estado final:").grid(row=2, column=1, sticky="ew")
+        tk.Label(self.root, text="Estado final:").grid(
+            row=4, column=1, columnspan=2, sticky="ew"
+        )
         self.final_state_area = scrolledtext.ScrolledText(
-            self.root, wrap=tk.WORD, state="disabled"
+            self.root, wrap=tk.WORD, width=60, height=10, state="disabled"
         )
         self.final_state_area.grid(
-            row=3, column=1, rowspan=2, padx=10, pady=10, sticky="nsew"
+            row=5, column=1, columnspan=2, padx=10, pady=10, sticky="nsew"
         )
 
         # Configurar la expansión de filas y columnas
@@ -57,8 +69,10 @@ class DreamchaserGUI:
         self.root.grid_rowconfigure(2, weight=1)
         self.root.grid_rowconfigure(3, weight=1)
         self.root.grid_rowconfigure(4, weight=1)
+        self.root.grid_rowconfigure(5, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
+        self.root.grid_columnconfigure(2, weight=1)
 
     def load_program(self):
         file_path = filedialog.askopenfilename(
