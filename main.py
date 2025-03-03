@@ -114,8 +114,20 @@ b = 2
 c = a + b
 """
 
+    bucleMinimo = """
+a = 0
+mientras a < 10
+    a = a + 1
+"""
+
+    programa2 = """
+a = verdadero
+si a
+    imprimir('verdadero')
+"""
+
     # Run each program
-    run_program(programa_minimo)
+    run_program()
 
 
 if __name__ == "__main__":
