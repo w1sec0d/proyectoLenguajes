@@ -20,6 +20,9 @@ diferencia_bigrafos bigrafo1, bigrafo2 en bigrafo_diferencia
 # Clonar un bigrafo
 clonar_bigrafo bigrafo1 en bigrafo_clon
 
+# Selecciona bigrafo
+seleccionar_bigrafo bigrafo1
+
 # Contar lugares de un nodo
 contar_lugares nodo1
 
