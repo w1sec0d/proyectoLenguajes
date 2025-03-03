@@ -19,3 +19,15 @@ diferencia_bigrafos bigrafo1, bigrafo2 en bigrafo_diferencia
 
 # Clonar un bigrafo
 clonar_bigrafo bigrafo1 en bigrafo_clon
+
+# Eliminar un lugar
+eliminar_lugar nodo1, nodo2
+
+# Eliminar un enlace
+eliminar_enlace nodo1, nodo3
+
+# Contar lugares de un nodo
+contar_lugares nodo1
+
+# Contar enlaces de un nodo
+contar_enlaces nodo1
