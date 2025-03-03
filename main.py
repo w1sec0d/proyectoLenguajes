@@ -34,6 +34,16 @@ def ejecutar_programa(texto_programa):
             f"  {nombre_funcion}({', '.join(interprete.functions[nombre_funcion]['params'])})"
         )
 
+    print("\nBigrafos:", end="\n")
+    for id_bigrafo, bigrafo in interprete.bigrafos.items():
+        print(f"  {id_bigrafo}:")
+        for id_nodo, nodo in bigrafo.nodos.items():
+            print(f"    Nodo {id_nodo} (tipo: {nodo.tipo}, valor: {nodo.valor})")
+            if nodo.lugares:
+                print(f"      Lugares: {[lugar.id for lugar in nodo.lugares]}")
+            if nodo.enlaces:
+                print(f"      Enlaces: {[enlace.id for enlace in nodo.enlaces]}")
+
     print("==============================\n")
 
 
@@ -135,7 +145,17 @@ crear_nodo nodo2('variable', '20')
 crear_nodo nodo3('funcion', 'suma')
 """
 
-    ejecutar_programa(programa_crear_nodo)
+    programa_crear_y_seleccionar_bigrafo = """
+crear_bigrafo bigrafo1
+crear_nodo nodo1('variable', '10')
+crear_nodo nodo2('variable', '20')
+
+crear_bigrafo bigrafo2
+seleccionar_bigrafo bigrafo2
+crear_nodo nodo3('funcion', 'suma')
+"""
+
+    ejecutar_programa(programa_crear_y_seleccionar_bigrafo)
 
 
 if __name__ == "__main__":

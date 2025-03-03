@@ -51,7 +51,8 @@ class DreamchaserInterpreter(DreamchaserListener):
         self.librerias_importadas = set()
         self.valor_actual = None
         self.resultados_bloque = {}
-        self.bigrafo = Bigrafo()
+        self.bigrafos = {}  # Diccionario para almacenar múltiples bigrafos
+        self.bigrafo_actual = None  # Identificador del bigrafo actual
 
         # Librerías predefinidas
         self.librerias = {
@@ -59,6 +60,21 @@ class DreamchaserInterpreter(DreamchaserListener):
             "potencia": pow,
             "imprimir": print,
         }
+
+    def crear_bigrafo(self, id):
+        if id not in self.bigrafos:
+            self.bigrafos[id] = Bigrafo()
+            self.bigrafo_actual = id
+            print(f"Bigrafo creado: {id}")
+        else:
+            print(f"Error: Bigrafo '{id}' ya existe")
+
+    def seleccionar_bigrafo(self, id):
+        if id in self.bigrafos:
+            self.bigrafo_actual = id
+            print(f"Bigrafo seleccionado: {id}")
+        else:
+            print(f"Error: Bigrafo '{id}' no existe")
 
     # Método auxiliar para evaluar expresiones
     def evaluar(self, ctx):
@@ -341,12 +357,43 @@ class DreamchaserInterpreter(DreamchaserListener):
     def enterFunctionCall(self, ctx):
         self.valor_actual = self.evaluar_llamada_funcion(ctx)
 
+    def enterCrearBigrafoStatement(self, ctx):
+        id_bigrafo = ctx.ID().getText()
+        if id_bigrafo not in self.bigrafos:
+            self.bigrafos[id_bigrafo] = Bigrafo()
+            self.bigrafo_actual = id_bigrafo
+            print(f"Bigrafo creado: {id_bigrafo}")
+        else:
+            print(f"Error: Bigrafo '{id_bigrafo}' ya existe")
+
+    def enterSeleccionarBigrafoStatement(self, ctx):
+        id_bigrafo = ctx.ID().getText()
+        if id_bigrafo in self.bigrafos:
+            self.bigrafo_actual = id_bigrafo
+            print(f"Bigrafo seleccionado: {id_bigrafo}")
+        else:
+            print(f"Error: Bigrafo '{id_bigrafo}' no existe")
+
     def enterCrearNodoStatement(self, ctx):
+        if self.bigrafo_actual is None:
+            print("Error: No hay un bigrafo seleccionado")
+            return
+
         id_nodo = ctx.ID().getText()
         tipo = ctx.STRING(0).getText()[1:-1]  # Eliminar comillas
         valor = ctx.STRING(1).getText()[1:-1]  # Eliminar comillas
-        self.bigrafo.agregar_nodo(id_nodo, tipo, valor)
-        print(f"Nodo creado: {id_nodo} (tipo: {tipo}, valor: {valor})")
+        self.bigrafos[self.bigrafo_actual].agregar_nodo(id_nodo, tipo, valor)
+        print(
+            f"Nodo creado en {self.bigrafo_actual}: {id_nodo} (tipo: {tipo}, valor: {valor})"
+        )
+
+        id_nodo = ctx.ID().getText()
+        tipo = ctx.STRING(0).getText()[1:-1]  # Eliminar comillas
+        valor = ctx.STRING(1).getText()[1:-1]  # Eliminar comillas
+        self.bigrafos[self.bigrafo_actual].agregar_nodo(id_nodo, tipo, valor)
+        print(
+            f"Nodo creado en {self.bigrafo_actual}: {id_nodo} (tipo: {tipo}, valor: {valor})"
+        )
 
     # Método auxiliar para ejecutar un bloque de declaraciones
     def ejecutar_bloque(self, ctx_bloque):

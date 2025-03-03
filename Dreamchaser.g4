@@ -13,9 +13,13 @@ statement:
 	| returnStatement
 	| functionCall NEWLINE
 	| crearNodoStatement NEWLINE
+	| crearBigrafoStatement NEWLINE
+	| seleccionarBigrafoStatement NEWLINE
 	| COMMENT NEWLINE?;
 
 crearNodoStatement: 'crear_nodo' ID '(' STRING ',' STRING ')';
+crearBigrafoStatement: 'crear_bigrafo' ID;
+seleccionarBigrafoStatement: 'seleccionar_bigrafo' ID;
 importStatement: 'importar' STRING NEWLINE;
 constStatement: 'const' ID (EQUALS)? literal NEWLINE;
 assignmentStatement: ID EQUALS expression NEWLINE;
