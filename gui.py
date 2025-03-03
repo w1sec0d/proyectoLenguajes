@@ -11,33 +11,60 @@ class DreamchaserGUI:
         self.root = root
         self.root.title("Lenguaje Dreamchaser - Edición Bigrafos")
 
+        # Establecer tamaño mínimo de la ventana
+        self.root.minsize(800, 600)
+
         self.create_widgets()
 
     def create_widgets(self):
         self.text_area = scrolledtext.ScrolledText(
-            self.root, wrap=tk.WORD, width=60, height=20
+            self.root, wrap=tk.WORD, width=60, height=10
         )
-        self.text_area.pack(padx=10, pady=10)
+        self.text_area.grid(
+            row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew"
+        )
 
         self.load_button = tk.Button(
             self.root, text="Cargar Programa (.txt)", command=self.load_program
         )
-        self.load_button.pack(pady=5)
+        self.load_button.grid(row=1, column=0, pady=5, sticky="ew")
 
         self.run_button = tk.Button(
             self.root, text="Correr Programa", command=self.run_program
         )
-        self.run_button.pack(pady=5)
+        self.run_button.grid(row=1, column=1, pady=5, sticky="ew")
 
+        tk.Label(self.root, text="Salida de ejecución:").grid(
+            row=2, column=0, columnspan=2, sticky="ew"
+        )
         self.output_area = scrolledtext.ScrolledText(
             self.root, wrap=tk.WORD, width=60, height=10, state="disabled"
         )
-        self.output_area.pack(padx=10, pady=10)
-
-        self.state_area = scrolledtext.ScrolledText(
-            self.root, wrap=tk.WORD, width=60, height=10, state="disabled"
+        self.output_area.grid(
+            row=3, column=0, columnspan=2, padx=10, pady=10, sticky="nsew"
         )
-        self.state_area.pack(padx=10, pady=10)
+
+        tk.Label(self.root, text="Estado final:").grid(
+            row=0, column=3, columnspan=2, sticky="ew"
+        )
+        self.final_state_area = scrolledtext.ScrolledText(
+            self.root, wrap=tk.WORD, width=60, height=20, state="disabled"
+        )
+        self.final_state_area.grid(
+            row=1, column=3, rowspan=4, columnspan=2, padx=10, pady=10, sticky="nsew"
+        )
+
+        # Configurar la expansión de filas y columnas
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
+        self.root.grid_rowconfigure(2, weight=1)
+        self.root.grid_rowconfigure(3, weight=1)
+        self.root.grid_rowconfigure(4, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
+        self.root.grid_columnconfigure(2, weight=1)
+        self.root.grid_columnconfigure(3, weight=1)
+        self.root.grid_columnconfigure(4, weight=1)
 
     def load_program(self):
         file_path = filedialog.askopenfilename(
@@ -53,8 +80,8 @@ class DreamchaserGUI:
         program = self.text_area.get(1.0, tk.END)
         self.output_area.config(state="normal")
         self.output_area.delete(1.0, tk.END)
-        self.state_area.config(state="normal")
-        self.state_area.delete(1.0, tk.END)
+        self.final_state_area.config(state="normal")
+        self.final_state_area.delete(1.0, tk.END)
 
         try:
             # Redirect print to output_area
@@ -77,7 +104,7 @@ class DreamchaserGUI:
             messagebox.showerror("Error", str(e))
 
         self.output_area.config(state="disabled")
-        self.state_area.config(state="disabled")
+        self.final_state_area.config(state="disabled")
 
     def ejecutar_programa(self, texto_programa):
         # Crear lexer y parser
@@ -90,45 +117,50 @@ class DreamchaserGUI:
         caminante = ParseTreeWalker()
         caminante.walk(interprete, arbol)
 
-        # Display final state
-        self.state_area.config(state="normal")
-        self.state_area.insert(tk.END, "\n======= Estado final =======\n")
-        self.state_area.insert(tk.END, "Variables:\n")
+        # Display final state in final_state_area
+        self.final_state_area.config(state="normal")
+        self.final_state_area.insert(tk.END, "Variables:\n")
         for var, valor in interprete.variables.items():
-            self.state_area.insert(tk.END, f"  {var} = {valor}\n")
+            self.final_state_area.insert(tk.END, f"  {var} = {valor}\n")
 
-        self.state_area.insert(tk.END, "\nConstantes:\n")
+        self.final_state_area.insert(tk.END, "==============================\n")
+
+        self.final_state_area.insert(tk.END, "\nConstantes:\n")
         for const, valor in interprete.constants.items():
-            self.state_area.insert(tk.END, f"  {const} = {valor}\n")
+            self.final_state_area.insert(tk.END, f"  {const} = {valor}\n")
 
-        self.state_area.insert(tk.END, "\nFunciones:\n")
+        self.final_state_area.insert(tk.END, "==============================\n")
+
+        self.final_state_area.insert(tk.END, "\nFunciones:\n")
         for nombre_funcion in interprete.functions:
-            self.state_area.insert(
+            self.final_state_area.insert(
                 tk.END,
                 f"  {nombre_funcion}({', '.join(interprete.functions[nombre_funcion]['params'])})\n",
             )
 
-        self.state_area.insert(tk.END, "\nBigrafos:\n")
+        self.final_state_area.insert(tk.END, "==============================\n")
+
+        self.final_state_area.insert(tk.END, "\nBigrafos:\n")
         for id_bigrafo, bigrafo in interprete.bigrafos.items():
-            self.state_area.insert(tk.END, f"  {id_bigrafo}:\n")
+            self.final_state_area.insert(tk.END, f"  {id_bigrafo}:\n")
             for id_nodo, nodo in bigrafo.nodos.items():
-                self.state_area.insert(
+                self.final_state_area.insert(
                     tk.END,
                     f"    Nodo {id_nodo} (tipo: {nodo.tipo}, valor: {nodo.valor})\n",
                 )
                 if nodo.lugares:
-                    self.state_area.insert(
+                    self.final_state_area.insert(
                         tk.END,
                         f"      Lugares: {[lugar.id for lugar in nodo.lugares]}\n",
                     )
                 if nodo.enlaces:
-                    self.state_area.insert(
+                    self.final_state_area.insert(
                         tk.END,
                         f"      Enlaces: {[enlace.id for enlace in nodo.enlaces]}\n",
                     )
 
-        self.state_area.insert(tk.END, "==============================\n")
-        self.state_area.config(state="disabled")
+        self.final_state_area.insert(tk.END, "==============================\n")
+        self.final_state_area.config(state="disabled")
 
 
 if __name__ == "__main__":
