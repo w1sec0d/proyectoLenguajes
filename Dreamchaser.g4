@@ -1,6 +1,6 @@
 grammar Dreamchaser;
 
-// Parser Rules
+// Reglas del parser
 program: (NEWLINE | statement)* EOF;
 
 statement:
@@ -49,7 +49,7 @@ literal:
 	| STRING	# StringLiteral
 	| BOOLEAN	# BooleanLiteral;
 
-// Lexer Rules
+// Reglas del lexer
 BOOLEAN: 'verdadero' | 'falso';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 NUMBER: INT ('.' [0-9]*)? (('e' | 'E') ('+' | '-')? [0-9]+)?;

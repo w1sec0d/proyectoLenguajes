@@ -9,305 +9,315 @@ class DreamchaserInterpreter(DreamchaserListener):
         self.variables = {}
         self.constants = {}
         self.functions = {}
-        self.imported_libraries = set()
-        self.current_value = None
-        self.block_results = {}
+        self.librerias_importadas = set()
+        self.valor_actual = None
+        self.resultados_bloque = {}
 
-        # Pre-defined libraries
-        self.libraries = {
+        # Librerías predefinidas
+        self.librerias = {
             "raizCuadrada": math.sqrt,
             "potencia": pow,
             "imprimir": print,
-        }  # The print function will be added in main.p
+        }
 
-    # Helper method to evaluate expressions
-    def evaluate(self, ctx):
-        # Check the type of ctx and handle accordingly
+    # Método auxiliar para evaluar expresiones
+    def evaluar(self, ctx):
+        # Verificar el tipo de ctx y manejarlo en consecuencia
         if ctx is None:
             return None
 
-        # Handle literal expressions directly by checking their type
+        # Manejar expresiones literales directamente verificando su tipo
         if isinstance(ctx, DreamchaserParser.NumberLiteralContext):
-            text = ctx.NUMBER().getText()
-            if "e" in text.lower():
-                return float(text)
-            elif "." in text:
-                return float(text)
+            texto = ctx.NUMBER().getText()
+            if "e" in texto.lower():
+                return float(texto)
+            elif "." in texto:
+                return float(texto)
             else:
-                return int(text)
+                return int(texto)
         elif isinstance(ctx, DreamchaserParser.StringLiteralContext):
-            text = ctx.STRING().getText()
-            return text[1:-1]  # Remove quotes
+            texto = ctx.STRING().getText()
+            return texto[1:-1]  # Eliminar comillas
         elif isinstance(ctx, DreamchaserParser.BooleanLiteralContext):
-            text = ctx.BOOLEAN().getText()
-            return text == "verdadero"
+            texto = ctx.BOOLEAN().getText()
+            return texto == "verdadero"
 
-        # Handle different expression types
+        # Manejar diferentes tipos de expresiones
         elif isinstance(ctx, DreamchaserParser.LiteralExprContext):
-            # For LiteralExpr, correctly delegate to the literal child
-            return self.evaluate(ctx.literal())
+            # Para LiteralExpr, delegar correctamente al hijo literal
+            return self.evaluar(ctx.literal())
 
         elif isinstance(ctx, DreamchaserParser.IdentifierExprContext):
-            var_name = ctx.ID().getText()
-            if var_name in self.variables:
-                return self.variables[var_name]
-            elif var_name in self.constants:
-                return self.constants[var_name]
+            nombre_var = ctx.ID().getText()
+            if nombre_var in self.variables:
+                return self.variables[nombre_var]
+            elif nombre_var in self.constants:
+                return self.constants[nombre_var]
             else:
-                print(f"Error: Variable or constant '{var_name}' is not defined")
+                print(f"Error: Variable o constante '{nombre_var}' no está definida")
                 return None
 
         elif isinstance(ctx, DreamchaserParser.ParenExprContext):
-            return self.evaluate(ctx.expression())
+            return self.evaluar(ctx.expression())
 
         elif isinstance(ctx, DreamchaserParser.MulDivExprContext):
-            left = self.evaluate(ctx.expression(0))
-            right = self.evaluate(ctx.expression(1))
+            izquierda = self.evaluar(ctx.expression(0))
+            derecha = self.evaluar(ctx.expression(1))
             op = ctx.op.text
 
-            if left is None or right is None:
+            if izquierda is None or derecha is None:
                 return None
 
             if op == "*":
-                return left * right
+                return izquierda * derecha
             elif op == "/":
-                if right == 0:
-                    print("Error: Division by zero")
+                if derecha == 0:
+                    print("Error: División por cero")
                     return None
-                return left / right
+                return izquierda / derecha
             elif op == "//":
-                if right == 0:
-                    print("Error: Division by zero")
+                if derecha == 0:
+                    print("Error: División por cero")
                     return None
-                return left // right
+                return izquierda // derecha
             elif op == "%":
-                if right == 0:
-                    print("Error: Modulo by zero")
+                if derecha == 0:
+                    print("Error: Módulo por cero")
                     return None
-                return left % right
+                return izquierda % derecha
 
         elif isinstance(ctx, DreamchaserParser.AddSubExprContext):
-            left = self.evaluate(ctx.expression(0))
-            right = self.evaluate(ctx.expression(1))
+            izquierda = self.evaluar(ctx.expression(0))
+            derecha = self.evaluar(ctx.expression(1))
             op = ctx.op.text
 
-            if left is None or right is None:
+            if izquierda is None or derecha is None:
                 return None
 
             if op == "+":
-                return left + right
+                return izquierda + derecha
             elif op == "-":
-                return left - right
+                return izquierda - derecha
 
         elif isinstance(ctx, DreamchaserParser.RelationalExprContext):
-            left = self.evaluate(ctx.expression(0))
-            right = self.evaluate(ctx.expression(1))
+            izquierda = self.evaluar(ctx.expression(0))
+            derecha = self.evaluar(ctx.expression(1))
             op = ctx.op.text
 
-            if left is None or right is None:
+            if izquierda is None or derecha is None:
                 return None
 
             if op == "==":
-                return left == right
+                return izquierda == derecha
             elif op == "!=":
-                return left != right
+                return izquierda != derecha
             elif op == ">":
-                return left > right
+                return izquierda > derecha
             elif op == "<":
-                return left < right
+                return izquierda < derecha
             elif op == ">=":
-                return left >= right
+                return izquierda >= derecha
             elif op == "<=":
-                return left <= right
+                return izquierda <= derecha
 
         elif isinstance(ctx, DreamchaserParser.FunctionCallExprContext):
-            return self.evaluate_function_call(ctx.functionCall())
+            return self.evaluar_llamada_funcion(ctx.functionCall())
 
         return None
 
-    def evaluate_function_call(self, ctx):
-        function_name = ctx.ID().getText()
+    def evaluar_llamada_funcion(self, ctx):
+        nombre_funcion = ctx.ID().getText()
         args = []
         if ctx.argList():
             for expr in ctx.argList().expression():
-                arg_value = self.evaluate(expr)
-                if arg_value is None:
+                valor_arg = self.evaluar(expr)
+                if valor_arg is None:
                     print(
-                        f"Error: Argument evaluation failed in function call '{function_name}'"
+                        f"Error: Fallo en la evaluación del argumento en la llamada a la función '{nombre_funcion}'"
                     )
                     return None
-                args.append(arg_value)
+                args.append(valor_arg)
 
-        # Check if it's a built-in library function (including print)
-        if function_name in self.imported_libraries or function_name in self.libraries:
-            if function_name in self.libraries:
+        # Verificar si es una función de librería incorporada (incluyendo imprimir)
+        if (
+            nombre_funcion in self.librerias_importadas
+            or nombre_funcion in self.librerias
+        ):
+            if nombre_funcion in self.librerias:
                 try:
-                    result = self.libraries[function_name](*args)
-                    # For print function, return None since print doesn't return a value in Python
-                    if function_name == "imprimir":
+                    resultado = self.librerias[nombre_funcion](*args)
+                    # Para la función imprimir, devolver None ya que imprimir no devuelve un valor en Python
+                    if nombre_funcion == "imprimir":
                         return None
-                    return result
+                    return resultado
                 except Exception as e:
                     print(
-                        f"Error executing library function '{function_name}': {str(e)}"
+                        f"Error al ejecutar la función de librería '{nombre_funcion}': {str(e)}"
                     )
                     return None
             else:
                 print(
-                    f"Error: Library function '{function_name}' is imported but not defined"
+                    f"Error: La función de librería '{nombre_funcion}' está importada pero no definida"
                 )
                 return None
 
-        # Check if it's a user-defined function
-        if function_name in self.functions:
-            function_def = self.functions[function_name]
+        # Verificar si es una función definida por el usuario
+        if nombre_funcion in self.functions:
+            definicion_funcion = self.functions[nombre_funcion]
 
-            if len(args) != len(function_def["params"]):
+            if len(args) != len(definicion_funcion["params"]):
                 print(
-                    f"Error: Function '{function_name}' expects {len(function_def['params'])} arguments, but got {len(args)}"
+                    f"Error: La función '{nombre_funcion}' espera {len(definicion_funcion['params'])} argumentos, pero recibió {len(args)}"
                 )
                 return None
 
-            # Save current variable state
-            old_vars = self.variables.copy()
+            # Guardar el estado actual de las variables
+            vars_anteriores = self.variables.copy()
 
-            # Set parameters
-            for i, param in enumerate(function_def["params"]):
+            # Establecer parámetros
+            for i, param in enumerate(definicion_funcion["params"]):
                 self.variables[param] = args[i]
 
-            # Execute function body
-            old_value = self.current_value
-            self.current_value = None
-            self.execute_block(function_def["block"])
-            result = self.current_value
-            if result is None:
-                result = old_value  # If no return statement, preserve previous value
+            # Ejecutar el cuerpo de la función
+            valor_anterior = self.valor_actual
+            self.valor_actual = None
+            self.ejecutar_bloque(definicion_funcion["block"])
+            resultado = self.valor_actual
+            if resultado is None:
+                resultado = valor_anterior  # Si no hay declaración de retorno, preservar el valor anterior
 
-            # Restore variable state
-            self.variables = old_vars
+            # Restaurar el estado de las variables
+            self.variables = vars_anteriores
 
-            return result
+            return resultado
 
-        # Check if it's a built-in function
-        print(f"Error: Function '{function_name}' is not defined")
+        # Verificar si es una función incorporada
+        print(f"Error: La función '{nombre_funcion}' no está definida")
         return None
 
-    # Listener methods
+    # Métodos del listener
     def enterProgram(self, ctx):
-        self.current_value = None
+        self.valor_actual = None
 
     def exitProgram(self, ctx):
         pass
 
     def enterImportStatement(self, ctx):
         if ctx.STRING() is None:
-            print("Error: Import statement missing library name")
+            print(
+                "Error: Falta el nombre de la librería en la declaración de importación"
+            )
             return
 
-        library_text = ctx.STRING().getText()
-        library_name = library_text[1:-1]  # Remove quotes
+        texto_libreria = ctx.STRING().getText()
+        nombre_libreria = texto_libreria[1:-1]  # Eliminar comillas
 
-        if library_name in self.libraries:
-            self.imported_libraries.add(library_name)
+        if nombre_libreria in self.librerias:
+            self.librerias_importadas.add(nombre_libreria)
         else:
-            print(f"Warning: Library '{library_name}' not found")
+            print(f"Advertencia: Librería '{nombre_libreria}' no encontrada")
 
     def enterConstStatement(self, ctx):
-        id_name = ctx.ID().getText()
+        nombre_id = ctx.ID().getText()
 
         if ctx.literal() is None:
-            print(f"Error: Missing value for constant '{id_name}'")
+            print(f"Error: Falta el valor para la constante '{nombre_id}'")
             return
 
-        value = self.evaluate(ctx.literal())
+        valor = self.evaluar(ctx.literal())
 
-        if id_name in self.constants:
+        if nombre_id in self.constants:
             print(
-                f"Warning: Constant '{id_name}' is already defined and will be overwritten"
+                f"Advertencia: La constante '{nombre_id}' ya está definida y será sobrescrita"
             )
 
-        self.constants[id_name] = value
+        self.constants[nombre_id] = valor
 
     def enterAssignmentStatement(self, ctx):
-        id_name = ctx.ID().getText()
+        nombre_id = ctx.ID().getText()
 
         if ctx.expression() is None:
-            print(f"Error: Missing expression in assignment to '{id_name}'")
+            print(f"Error: Falta la expresión en la asignación a '{nombre_id}'")
             return
 
-        value = self.evaluate(ctx.expression())
+        valor = self.evaluar(ctx.expression())
 
-        if id_name in self.constants:
-            print(f"Error: Cannot assign to constant '{id_name}'")
+        if nombre_id in self.constants:
+            print(f"Error: No se puede asignar a la constante '{nombre_id}'")
             return
 
-        self.variables[id_name] = value
+        self.variables[nombre_id] = valor
 
     def enterConditionalStatement(self, ctx):
         if ctx.expression() is None:
-            print("Error: Missing condition in 'si' statement")
+            print("Error: Falta la condición en la declaración 'si'")
             return
 
-        condition = self.evaluate(ctx.expression())
+        condicion = self.evaluar(ctx.expression())
 
-        if condition:
+        if condicion:
             if ctx.block(0) is not None:
-                self.execute_block(ctx.block(0))
+                self.ejecutar_bloque(ctx.block(0))
         elif len(ctx.block()) > 1:
-            self.execute_block(ctx.block(1))
+            self.ejecutar_bloque(ctx.block(1))
 
     def enterWhileStatement(self, ctx):
         if ctx.expression() is None:
-            print("Error: Missing condition in 'mientras' statement")
+            print("Error: Falta la condición en la declaración 'mientras'")
             return
 
-        # Add a safety limit to prevent infinite loops during development
-        max_iterations = 10000
-        iteration_count = 0
+        # Agregar un límite de seguridad para evitar bucles infinitos durante el desarrollo
+        max_iteraciones = 10000
+        contador_iteraciones = 0
 
-        while self.evaluate(ctx.expression()) and iteration_count < max_iterations:
-            self.execute_block(ctx.block())
-            iteration_count += 1
+        while self.evaluar(ctx.expression()) and contador_iteraciones < max_iteraciones:
+            self.ejecutar_bloque(ctx.block())
+            contador_iteraciones += 1
 
-        if iteration_count >= max_iterations:
-            print("Warning: Maximum loop iterations reached, possible infinite loop")
+        if contador_iteraciones >= max_iteraciones:
+            print(
+                "Advertencia: Se alcanzó el máximo de iteraciones del bucle, posible bucle infinito"
+            )
 
     def enterFunctionDefinition(self, ctx):
-        function_name = ctx.ID().getText()
+        nombre_funcion = ctx.ID().getText()
         params = []
 
         if ctx.paramList():
             for param in ctx.paramList().ID():
                 params.append(param.getText())
 
-        # Store function definition
-        self.functions[function_name] = {"params": params, "block": ctx.block()}
+        # Almacenar la definición de la función
+        self.functions[nombre_funcion] = {"params": params, "block": ctx.block()}
 
     def enterReturnStatement(self, ctx):
         if ctx.expression() is None:
-            print("Error: Missing expression in 'retornar' statement")
-            self.current_value = None
+            print("Error: Falta la expresión en la declaración 'retornar'")
+            self.valor_actual = None
             return
 
-        self.current_value = self.evaluate(ctx.expression())
+        self.valor_actual = self.evaluar(ctx.expression())
 
     def enterFunctionCall(self, ctx):
-        self.current_value = self.evaluate_function_call(ctx)
+        self.valor_actual = self.evaluar_llamada_funcion(ctx)
 
-    # Helper method to execute a block of statements
-    def execute_block(self, block_ctx):
-        if block_ctx is None:
-            print("Error: Missing block")
+    # Método auxiliar para ejecutar un bloque de declaraciones
+    def ejecutar_bloque(self, ctx_bloque):
+        if ctx_bloque is None:
+            print("Error: Falta el bloque")
             return
 
-        old_value = self.current_value
-        for statement in block_ctx.statement():
+        valor_anterior = self.valor_actual
+        for declaracion in ctx_bloque.statement():
             try:
-                walker = ParseTreeWalker()
-                walker.walk(self, statement)
-                # If we hit a return statement, break out
-                if self.current_value is not None and self.current_value != old_value:
+                caminante = ParseTreeWalker()
+                caminante.walk(self, declaracion)
+                # Si encontramos una declaración de retorno, salir
+                if (
+                    self.valor_actual is not None
+                    and self.valor_actual != valor_anterior
+                ):
                     break
             except Exception as e:
-                print(f"Error executing statement: {str(e)}")
-                # Continue execution with next statement
+                print(f"Error al ejecutar la declaración: {str(e)}")
+                # Continuar la ejecución con la siguiente declaración

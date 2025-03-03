@@ -4,40 +4,42 @@ from antlr_output.DreamchaserParser import DreamchaserParser
 from dreamchaser_interpreter import DreamchaserInterpreter
 
 
-def run_program(program_text):
-    # Create lexer and parser
-    input_stream = InputStream(program_text)
-    lexer = DreamchaserLexer(input_stream)
-    token_stream = CommonTokenStream(lexer)
-    parser = DreamchaserParser(token_stream)
+def ejecutar_programa(texto_programa):
+    # Crear lexer y parser
+    flujo_entrada = InputStream(texto_programa)
+    lexer = DreamchaserLexer(flujo_entrada)
+    flujo_tokens = CommonTokenStream(lexer)
+    parser = DreamchaserParser(flujo_tokens)
 
-    # Parse the input
-    tree = parser.program()
+    # Parsear la entrada
+    arbol = parser.program()
 
-    # Create listener and walk the parse tree
-    interpreter = DreamchaserInterpreter()
-    walker = ParseTreeWalker()
-    walker.walk(interpreter, tree)
+    # Crear el intérprete y recorrer el árbol de análisis
+    interprete = DreamchaserInterpreter()
+    caminante = ParseTreeWalker()
+    caminante.walk(interprete, arbol)
 
     print("\n======= Estado final =======")
     print("Variables:", end="\n")
-    for var, value in interpreter.variables.items():
-        print(f"  {var} = {value}")
+    for var, valor in interprete.variables.items():
+        print(f"  {var} = {valor}")
 
     print("\nConstantes:", end="\n")
-    for const, value in interpreter.constants.items():
-        print(f"  {const} = {value}")
+    for const, valor in interprete.constants.items():
+        print(f"  {const} = {valor}")
 
     print("\nFunciones:", end="\n")
-    for func_name in interpreter.functions:
-        print(f"  {func_name}({', '.join(interpreter.functions[func_name]['params'])})")
+    for nombre_funcion in interprete.functions:
+        print(
+            f"  {nombre_funcion}({', '.join(interprete.functions[nombre_funcion]['params'])})"
+        )
 
     print("==============================\n")
 
 
 def main():
-    # Your example programs
-    programaPrueba = """
+    # Tus programas de ejemplo
+    programa_prueba = """
 # Importando librerías precompiladas
 importar 'raizCuadrada'
 importar 'potencia'
@@ -79,7 +81,7 @@ materia2 = MATERIA
 # Este es un comentario que debe ser ignorado por el lexer
 """
 
-    programaPrueba2 = """
+    programa_prueba2 = """
 importar 'libreria.txt'
 const PI 3.141592654
 const E = 2.718281828
@@ -93,7 +95,7 @@ funcion suma(a, b)
  retornar a + b
 """
 
-    programaPrueba3 = """
+    programa_prueba3 = """
 const PI 3.141592654
 const MATERIA 'LENGUAJES DE PROGRAMACIÓN'
 a = 10
@@ -108,13 +110,13 @@ b = NOTA + 1
 imprimir(a)
 """
 
-    programaPrint = """
+    programa_print = """
 a = 42
 b = 2
 c = a + b
 """
 
-    bucleMinimo = """
+    bucle_minimo = """
 a = 0
 mientras a < 10
     a = a + 1
@@ -124,10 +126,9 @@ mientras a < 10
 a = verdadero
 si a
     imprimir('verdadero')
+c = potencia(2,2)
 """
-
-    # Run each program
-    run_program()
+    ejecutar_programa(programa2)
 
 
 if __name__ == "__main__":
